@@ -13,7 +13,7 @@ const updateOrderQueue = new Queue('updateOrderStatus', {
 
 // 处理队列任务
 updateOrderQueue.process(async (job) => {
-    const { orderId, deInfo } = job.data;
+    const { orderId } = job.data;
     try {
         const result = await OrdersService.processPaidOrder(orderId);
         if (!result.success) {

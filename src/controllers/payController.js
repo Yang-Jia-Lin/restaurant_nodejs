@@ -2,6 +2,7 @@ const express = require('express');
 const { updateOrderQueue } = require('./queueHandlers'); // 引入队列处理器
 const OrdersService = require('../services/ordersService');
 const PayService = require('../services/payService');
+const userService = require("../services/usersService");
 const router = express.Router();
 
 // 创建PayService实例
@@ -56,8 +57,7 @@ router.post('/payment-notify', async (req, res) => {
 
         // 验证成功，将订单更新任务添加到队列
         await updateOrderQueue.add({
-            orderId: verificationResult.deInfo.out_trade_no,
-            deInfo: verificationResult.deInfo
+            orderId: verificationResult.deInfo.out_trade_no
         }, {
             attempts: 3, // 尝试执行任务的次数
             backoff: {
@@ -76,6 +76,57 @@ router.post('/payment-notify', async (req, res) => {
     }
 });
 
+
+// 积点支付
+router.post('/create_and_pay_points', async (req, res) => {
+    try {
+        const orderData = req.body.orderData;
+        const orderDetails = req.body.orderDetails;
+        const pointsToDeduct = req.body.pointsToDeduct;
+        // 1.创建订单
+        const order = await OrdersService.createOrder(orderData, orderDetails);
+        if (!order) {
+            console.error('积点支付失败');
+            res.status(500).json({ error: '积点支付失败，原因：订单创建失败' });
+            return;
+        }
+
+        // 2.消费积点
+        const userId = orderData.user_id;
+        const user = await userService.getUserById(userId);
+        if (user.points < pointsToDeduct) {
+            return res.status(400).json({ error: '积点不足' });
+        }
+        const updatedUser = await userService.updateUser(userId, { points: user.points - pointsToDeduct });
+
+        // 3.开始制作，将订单更新任务添加到队列
+        await updateOrderQueue.add({
+            orderId: order.order_id
+        }, {
+            attempts: 3, // 尝试执行任务的次数
+            backoff: {
+                type: 'fixed', // 或 'exponential'
+                delay: 5000, // 重试间隔毫秒数
+            }
+        });
+
+        // 返回结果
+        if (updatedUser) {
+            res.status(201).json({
+                success: true,
+                order: order,
+                user: updatedUser
+            });
+        } else {
+            console.error('积点支付失败');
+            res.status(500).json({ error: '积点支付失败' });
+        }
+
+    } catch (error) {
+        console.error('支付失败', error);
+        res.status(500).json({ error: '积点支付失败' });
+    }
+});
 
 
 module.exports = router;
