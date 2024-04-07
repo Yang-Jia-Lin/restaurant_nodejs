@@ -75,6 +75,17 @@ router.put('/:userId', async (req, res) => {
         res.status(500).json({ success: false, message: 'Error updating user', error });
     }
 });
+router.put('/addPoints/:userId', async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const { pointsToAdd } = req.body;
+        const updatedUser = await userService.addUserPoints(userId, pointsToAdd);
+        res.json({ success: true, updatedUser });
+    } catch (error) {
+        console.error('Error adding points to user:', error);
+        res.status(500).json({ success: false, message: 'Error adding points to user', error });
+    }
+});
 
 // 5.获取手机号
 router.post('/phone', async (req, res) => {

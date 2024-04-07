@@ -54,6 +54,33 @@ async function updateUser(userId, updateData) {
         throw error;
     }
 }
+async function addUserPoints(userId, pointsToAdd) {
+    try {
+        const user = await User.findByPk(userId);
+        if (!user) {
+            throw new Error('User not found');
+        }
+
+        // 计算新的积点总数
+        const newPoints = (Number(user.points) || 0) + Number(pointsToAdd);
+        const [updated] = await User.update({ points: newPoints }, {
+            where: { user_id: userId }
+        });
+
+        // 检查是否成功更新了记录
+        if (!updated) {
+            throw new Error('Update failed');
+        }
+
+        // 返回更新后的用户记录
+        const updatedUser = await User.findByPk(userId);
+        return updatedUser;
+    } catch (error) {
+        console.error('Error adding user points:', error);
+        throw error; // 适当的错误处理或再次抛出异常
+    }
+}
+
 
 // 4. 删除用户信息(删)
 async function deleteUser(userId) {
@@ -76,5 +103,6 @@ module.exports = {
     getUserById,
     getUserByOpenId,
     updateUser,
-    deleteUser
+    deleteUser,
+    addUserPoints
 };
