@@ -1,9 +1,8 @@
-# Ignore .env file
-.env
-
-# Ignore the entire secrets folder
-node_modules/
+# Ignore the entire cert folder
 cert/
-
+# Ignore environment configuration file
+.env
 # Ignore JetBrains IDE settings folder
 .idea/
+# Ignore Node.js modules folder
+node_modules/
