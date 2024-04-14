@@ -4,3 +4,6 @@
 # Ignore the entire secrets folder
 node_modules/
 cert/
+
+# Ignore JetBrains IDE settings folder
+.idea/
