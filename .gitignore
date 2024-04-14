@@ -1,0 +1,6 @@
+# Ignore .env file
+.env
+
+# Ignore the entire secrets folder
+node_modules/
+cert/
