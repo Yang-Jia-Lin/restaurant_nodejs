@@ -1,4 +1,3 @@
-// configManager.js
 let shouldPrintOrders = true; // 默认启用打印
 
 const setShouldPrintOrders = (value) => {

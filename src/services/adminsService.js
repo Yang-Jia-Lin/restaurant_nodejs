@@ -13,14 +13,12 @@ const adminsService = {
             }
 
             // 创建管理员
-            const admin = await Admin.create({
+            return await Admin.create({
                 admin_account,
                 admin_password, // 密码在模型层通过钩子自动加密
                 store_id,
                 role
             });
-
-            return admin;
         } catch (error) {
             throw error;
         }

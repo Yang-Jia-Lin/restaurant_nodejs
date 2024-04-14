@@ -20,13 +20,13 @@ const allowedOrigins = ['*'];
 
 const app = express();
 const corsOptions = {
-  origin: (origin, callback) => {
-    if (allowedOrigins.includes(origin) || !origin) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+    origin: (origin, callback) => {
+        if (allowedOrigins.includes(origin) || !origin) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
 };
 app.use(cors(corsOptions));
 app.use(express.json());
@@ -44,12 +44,17 @@ app.use('/restaurant/setPrinter', setPrinter);
 
 // 定义定时任务启动函数
 function startOrderProcessingScheduler() {
-  const interval = 1 * 60 * 1000; // 每1分钟执行一次
-  setInterval(() => {
-    	OrdersService.scanAndProcessOrders();
-  }, interval);
-  console.log('Order processing scheduler started.');
+    const interval = 60 * 1000; // 设置间隔为60秒
+    setInterval(async () => { // 将回调函数改为异步函数
+        try {
+            await OrdersService.scanAndProcessOrders(); // 等待异步操作完成
+        } catch (error) {
+            console.error('Error processing orders:', error); // 处理可能发生的错误
+        }
+    }, interval);
+    console.log('Order processing scheduler started.'); // 确认调度器启动
 }
+
 
 //function startDailyOrderDeletionScheduler() {
 //  const interval = 12 * 60 * 60 * 1000;
@@ -62,24 +67,23 @@ function startOrderProcessingScheduler() {
 
 // 启动Express服务器
 sequelize.sync().then(() => {
-  app.listen(3000, () => {
-    console.log('Server is running on port 3000. Database connected.');
-    // 启动定时任务
-    startOrderProcessingScheduler(); 
-    //startDailyOrderDeletionScheduler();
-  });
+    app.listen(3000, () => {
+        console.log('Server is running on port 3000. Database connected.');
+        // 启动定时任务
+        startOrderProcessingScheduler();
+        //startDailyOrderDeletionScheduler();
+    });
 }).catch(err => {
-  console.error('Unable to connect to the database:', err);
+    console.error('Unable to connect to the database:', err);
 });
 
 
 // 全局未捕获异常和Promise拒绝处理
 process.on('unhandledRejection', (reason, promise) => {
     console.error('未处理的拒绝：', promise, 'reason:', reason);
-    
 });
 
 process.on('uncaughtException', (error) => {
     console.error('未捕获的异常：', error);
-    //process.exit(1); // 强烈推荐在处理完未捕获异常后重启应用
+    process.exit(1);
 });
