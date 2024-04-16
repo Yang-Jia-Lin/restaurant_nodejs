@@ -1,7 +1,15 @@
 require('./dbModels/associateModels'); // 加载模型关联定义
 require('./controllers/queueHandlers');// 加载队列
 const express = require('express'); // 加载Express模块
+const RateLimit = require('express-rate-limit');// 加载Express的请求速率限制模块
+
 const app = express(); // 创建Express应用实例，与下面的Router实例（require）关联
+const limiter = RateLimit({// 配置请求速率限制
+    windowMs: 15 * 60 * 1000, // 时间窗口为15分钟
+    max: 1000, // 每个时间窗口内最多1000个请求
+    message: "Too many requests, please try again later." // 当达到限制时返回的消息
+});
+app.use(limiter);
 
 // 加载：应用的路由模块
 const sequelize = require('./config/dbConfig');
