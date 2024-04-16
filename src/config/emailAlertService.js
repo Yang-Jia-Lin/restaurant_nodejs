@@ -1,4 +1,7 @@
 require('dotenv').config();
+const username = process.env.EMAIL_USERNAME;
+const password = process.env.EMAIL_PASSWORD;
+
 const nodemailer = require('nodemailer');
 
 class EmailAlertService {
@@ -9,8 +12,8 @@ class EmailAlertService {
             port: 465,
             secure: true, // 使用 SSL
             auth: {
-                user: "2239969828@qq.com",
-                pass: "nwezbnkvlefzeajc"
+                user: username,
+                pass: password
             }
         });
     }

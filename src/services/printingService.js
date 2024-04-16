@@ -1,7 +1,10 @@
 require('dotenv').config();
-const appId = "sp65c4ca333fa1f";
-const appSecret = "74a7972c1de88cd6ad9c9b37b9d44be4";
-const printerId = "1552501851";
+// const appId = "sp65c4ca333fa1f";
+// const appSecret = "74a7972c1de88cd6ad9c9b37b9d44be4";
+// const printerId = "1552501851";
+const appId = process.env.PRINTER_APPID;
+const appSecret = process.env.PRINTER_APIKEY;
+const printerId = process.env.PRINTER_ID;
 const Api = require('../lib/api');
 
 // 预处理订单数据
@@ -29,5 +32,4 @@ const printingService = {
         }
     }
 };
-
 module.exports = printingService;

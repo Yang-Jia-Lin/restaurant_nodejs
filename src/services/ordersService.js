@@ -92,7 +92,7 @@ const OrdersService = {
         try {
             // 检查订单状态
             console.log("@@beginMakeOrder",order);
-            if (order.dataValues.order_status !== '等待中'){
+            if (order.order_status !== '等待中'){
                 throw new Error('订单状态错误，无法开始制作');
             }
 

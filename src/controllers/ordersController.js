@@ -41,7 +41,16 @@ router.get('/user/:userId/status/:status', async (req, res) => {
     }
 });
 
-
+// 3.用户获取某个订单
+router.get('/user/details/:orderId', async (req, res) => {
+    try {
+        const order = await OrdersService.getOrderDetails(req.params.orderId);
+        res.status(200).send(order);
+    } catch (error) {
+        console.error('用户获取特定订单status请求时出现错误', error.message);
+        res.status(400).send({error: error.message});
+    }
+});
 
 // ===================================门店操作==================================
 // ============================================================================
