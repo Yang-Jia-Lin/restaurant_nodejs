@@ -1,7 +1,7 @@
-const { Model, DataTypes } = require('sequelize');
+const {Model, DataTypes} = require('sequelize');
 const sequelize = require('../config/dbConfig'); // 引入Sequelize实例
 
-class Address extends Model { }
+class Address extends Model {}
 
 Address.init({
     address_id: {

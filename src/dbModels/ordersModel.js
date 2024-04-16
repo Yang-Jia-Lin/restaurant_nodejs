@@ -2,7 +2,7 @@ const { Model, DataTypes } = require('sequelize');
 const { v4: uuidv4 } = require('uuid'); // 引入 uuid 模块
 const sequelize = require('../config/dbConfig');
 
-// 函数来生成没有破折号的 UUID
+// 生成没有破折号的 UUID
 const generateUUIDWithoutDashes = () => {
     return uuidv4().replace(/-/g, '');
 };

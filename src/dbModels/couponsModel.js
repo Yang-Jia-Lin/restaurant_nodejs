@@ -1,5 +1,5 @@
 const { Model, DataTypes } = require('sequelize');
-const sequelize = require('../config/dbConfig'); // 引入Sequelize实例
+const sequelize = require('../config/dbConfig');
 
 class Coupon extends Model { }
 

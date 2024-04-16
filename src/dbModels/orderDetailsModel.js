@@ -26,7 +26,6 @@ OrderDetail.init({
         }
     },
     dish_name: DataTypes.STRING(255),
-
     eat_type: {
         type: DataTypes.ENUM('堂食', '打包'),
         defaultValue: '堂食'
@@ -42,8 +41,7 @@ OrderDetail.init({
         type: DataTypes.DECIMAL(10, 2),
         allowNull: false
     },
-    note: DataTypes.TEXT,
-    
+    note: DataTypes.TEXT,
 }, {
     sequelize,
     modelName: 'OrderDetail',

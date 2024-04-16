@@ -1,5 +1,5 @@
 const { Model, DataTypes } = require('sequelize');
-const sequelize = require('../config/dbConfig'); // 引入Sequelize实例
+const sequelize = require('../config/dbConfig');
 const bcrypt = require('bcryptjs');
 
 class Admin extends Model { }
@@ -17,7 +17,7 @@ Admin.init({
     store_id: {
         type: DataTypes.INTEGER,
         references: {
-            model: 'stores', // 指向Store模型
+            model: 'stores', // 指向Store模型，使用表名而非模型名
             key: 'store_id'
         }
     },

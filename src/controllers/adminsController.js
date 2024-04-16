@@ -1,8 +1,7 @@
 // src/controllers/adminsController.js
 const express = require('express');
 const adminsService = require('../services/adminsService');
-
-const router = express.Router();
+const router = express.Router(); // 实例化一个express路由
 
 // 管理员注册
 router.post('/register', async (req, res) => {
@@ -16,6 +15,7 @@ router.post('/register', async (req, res) => {
         });
         res.status(201).json(admin);
     } catch (error) {
+        console.error("Register admin caught an error:", error.message);
         res.status(400).json({ message: error.message });
     }
 });
@@ -30,6 +30,7 @@ router.post('/login', async (req, res) => {
         });
         res.json(admin);
     } catch (error) {
+        console.error("Login admin caught an error:", error.message);
         res.status(401).json({ message: error.message });
     }
 });

@@ -1,7 +1,7 @@
-const { Model, DataTypes } = require('sequelize');
+const {Model, DataTypes} = require('sequelize');
 const sequelize = require('../config/dbConfig');
 
-class Dish extends Model { }
+class Dish extends Model {}
 
 Dish.init({
     dish_id: {
@@ -29,21 +29,11 @@ Dish.init({
         type: DataTypes.INTEGER,
         defaultValue: 0
     },
-    icon: {
-        type: DataTypes.STRING(255) // 存储菜品图标的路径或URL
-    },
-    keywords: {
-        type: DataTypes.TEXT // 菜品关键字
-    },
-    flavor_description: {
-        type: DataTypes.TEXT // 菜品口味描述
-    },
-    mandatory_options: {
-        type: DataTypes.JSON // 菜品必选项
-    },
-    optional_options: {
-        type: DataTypes.JSON // 菜品多选项
-    }
+    icon: DataTypes.STRING(255), // 存储菜品图标的路径或URL
+    keywords: DataTypes.TEXT, // 菜品关键字
+    flavor_description: DataTypes.TEXT, // 菜品口味描述
+    mandatory_options: DataTypes.JSON,// 菜品必选项
+    optional_options: DataTypes.JSON // 菜品多选项
 }, {
     sequelize,
     modelName: 'Dish',

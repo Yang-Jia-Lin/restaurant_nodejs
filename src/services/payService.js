@@ -1,5 +1,4 @@
 require('dotenv').config();
-const OrdersService = require('./ordersService');
 const fs = require('fs');
 const crypto = require('crypto');
 const axios = require('axios');
@@ -25,8 +24,7 @@ class PayService {
     loadCertificate() {
         const pemPath = `./cert/${this.ac.pem}`;
         try {
-            const certContent = fs.readFileSync(pemPath, "utf-8");
-            return certContent;
+            return fs.readFileSync(pemPath, "utf-8");
         } catch (err) {
             console.error('证书文件读取失败:', err);
             return null;
@@ -141,13 +139,11 @@ class PayService {
     // 支付回调验证
     async verifyPaymentSuccess(req) {
         try {
-            let result = req.body;
-            const deInfo = await this.decodePayNotify(result.resource);
-            if (deInfo && deInfo.trade_state === 'SUCCESS') {
-                return { success: true, deInfo };
-            } else {
-                return { success: false, message: '支付验证失败', status: 500 };
+            const deInfo = await this.decodePayNotify(req.body.resource);
+            if (!deInfo || deInfo.trade_state !== 'SUCCESS') {
+                throw new Error('支付回调参数错误');
             }
+            return { success: true, deInfo };
         } catch (err) {
             console.error('支付回调验证失败', err);
             return { success: false, message: '支付回调验证失败', status: 500 };

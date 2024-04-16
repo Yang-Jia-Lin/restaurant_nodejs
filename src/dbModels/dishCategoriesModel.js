@@ -12,16 +12,14 @@ DishCategory.init({
     category_name: {
         type: DataTypes.STRING(255),
         allowNull: false,
-        unique: true // 确保分类名称是唯一的
+        unique: true
     },
-    category_icon: {
-        type: DataTypes.STRING(255) // 可以为空，存储分类图标路径
-    }
+    category_icon: DataTypes.STRING(255)
 }, {
     sequelize,
     modelName: 'DishCategory',
     tableName: 'dish_categories',
-    timestamps: false // 不需要自动时间戳
+    timestamps: false // 不启用自动时间戳
 });
 
 module.exports = DishCategory;

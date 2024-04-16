@@ -2,11 +2,10 @@ const express = require('express');
 const storesService = require('../services/storesService');
 const router = express.Router();
 
-// 1. 添加门店信息
+// 1.添加门店
 router.post('/', async (req, res) => {
     try {
-        const storeData = req.body;
-        const newStore = await storesService.createStore(storeData);
+        const newStore = await storesService.createStore(req.body);
         res.status(201).json({ success: true, store: newStore });
     } catch (error) {
         console.error('Error creating store:', error);
@@ -14,7 +13,8 @@ router.post('/', async (req, res) => {
     }
 });
 
-// 2. 获取特定门店信息
+
+// 2.获取特定门店
 router.get('/:storeId', async (req, res) => {
     try {
         const { storeId } = req.params;
@@ -26,7 +26,8 @@ router.get('/:storeId', async (req, res) => {
     }
 });
 
-// 3. 获取所有门店信息，如果提供了经纬度参数则按照距离排序
+
+// 3. 获取所有门店，如果提供了经纬度参数则按照距离排序
 router.get('/', async (req, res) => {
     try {
         const { latitude, longitude } = req.query;
@@ -47,7 +48,8 @@ router.get('/', async (req, res) => {
     }
 });
 
-// 4. 修改门店状态
+
+// 4.修改门店状态
 router.put('/:storeId', async (req, res) => {
     try {
         const { storeId } = req.params;
@@ -60,7 +62,8 @@ router.put('/:storeId', async (req, res) => {
     }
 });
 
-// 5. 删除门店信息
+
+// 5.删除门店信息
 router.delete('/:storeId', async (req, res) => {
     try {
         const { storeId } = req.params;

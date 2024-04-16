@@ -1,108 +1,88 @@
 const User = require('../dbModels/usersModel');
 
-// 1. 保存用户相关信息(增)
-async function createUser(userData) {
-    try {
-        const newUser = await User.create(userData);
-        return newUser;
-    } catch (error) {
-        console.error('Error creating user:', error);
-        throw error;
-    }
-}
+const userService = {
 
-// 2. 获取用户信息(查)
-async function getUserById(userId) {
-    try {
-        const user = await User.findByPk(userId);
-        if (!user) {
-            throw new Error('User not found');
+    // 1.创建用户
+    createUser: async (userData) => {
+        try {
+            return await User.create(userData);
+        } catch (error) {
+            throw error;
         }
-        return user;
-    } catch (error) {
-        console.error('Error finding user:', error);
-        throw error;
-    }
-}
-
-async function getUserByOpenId(openid) {
-    try {
-        const user = await User.findOne({
-            where: { openid: openid }
-        });
-        return user;
-    } catch (error) {
-        console.error('Error finding user by openid:', error);
-        throw error;
-    }
-}
+    },
 
 
-// 3. 修改用户相关信息(改)
-async function updateUser(userId, updateData) {
-    try {
-        const [updated] = await User.update(updateData, {
-            where: { user_id: userId }
-        });
-        if (updated) {
-            const updatedUser = await User.findByPk(userId);
-            return updatedUser;
+    // 2.获取用户信息
+    getUserById: async (userId) => {
+        try {
+            const user = await User.findByPk(userId);
+            if (!user) {
+                throw new Error('User not found');
+            }
+            return user;
+        } catch (error) {
+            throw error;
         }
-        throw new Error('User not found');
-    } catch (error) {
-        console.error('Error updating user:', error);
-        throw error;
-    }
-}
-async function addUserPoints(userId, pointsToAdd) {
-    try {
-        const user = await User.findByPk(userId);
-        if (!user) {
-            throw new Error('User not found');
+    },
+    getUserByOpenId: async (openid) => {
+        try {
+            return await User.findOne({
+                where: { openid: openid }
+            });
+        } catch (error) {
+            throw error;
         }
+    },
 
-        // 计算新的积点总数
-        const newPoints = (Number(user.points) || 0) + Number(pointsToAdd);
-        const [updated] = await User.update({ points: newPoints }, {
-            where: { user_id: userId }
-        });
 
-        // 检查是否成功更新了记录
-        if (!updated) {
-            throw new Error('Update failed');
+    // 3.更新用户信息
+    updateUser: async (userId, updateData) => {
+        try {
+            const [updated] = await User.update(updateData, {
+                where: { user_id: userId }
+            });
+            if (!updated) {
+                throw new Error('User not found');
+            }
+            return await User.findByPk(userId);
+        } catch (error) {
+            console.error('Error updating user:', error);
+            throw error;
         }
-
-        // 返回更新后的用户记录
-        const updatedUser = await User.findByPk(userId);
-        return updatedUser;
-    } catch (error) {
-        console.error('Error adding user points:', error);
-        throw error; // 适当的错误处理或再次抛出异常
-    }
-}
-
-
-// 4. 删除用户信息(删)
-async function deleteUser(userId) {
-    try {
-        const deleted = await User.destroy({
-            where: { user_id: userId }
-        });
-        if (deleted) {
-            return { message: 'User deleted successfully' };
+    },
+    addUserPoints: async (userId, pointsToAdd) => {
+        try {
+            const user = await User.findByPk(userId);
+            if (!user) {
+                throw new Error('User not found');
+            }
+            const newPoints = (Number(user.points) || 0) + Number(pointsToAdd);
+            const [updated] = await User.update({ points: newPoints }, {
+                where: { user_id: userId }
+            });
+            if (!updated) {
+                throw new Error('Update failed');
+            }
+            return await User.findByPk(userId);
+        } catch (error) {
+            throw error;
         }
-        throw new Error('User not found');
-    } catch (error) {
-        console.error('Error deleting user:', error);
-        throw error;
-    }
-}
+    },
 
-module.exports = {
-    createUser,
-    getUserById,
-    getUserByOpenId,
-    updateUser,
-    deleteUser,
-    addUserPoints
+
+    // 4.删除用户
+    deleteUser: async (userId) => {
+        try {
+            const deleted = await User.destroy({
+                where: { user_id: userId }
+            });
+            if (!deleted) {
+                throw new Error('User not found');
+            }
+        } catch (error) {
+            throw error;
+        }
+    }
 };
+
+module.exports = userService;

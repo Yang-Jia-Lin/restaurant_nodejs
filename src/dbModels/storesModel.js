@@ -38,14 +38,12 @@ Store.init({
     announcement: {
         type: DataTypes.TEXT,
     },
-    // 添加经纬度字段
     longitude: {
         type: DataTypes.FLOAT(10, 6),
     },
     latitude: {
         type: DataTypes.FLOAT(10, 6),
-    },
-    // 增加不外送时间段
+    },
     takeout_stop_begin1: {
         type: DataTypes.TIME,
     },

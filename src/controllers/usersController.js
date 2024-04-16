@@ -1,45 +1,44 @@
 require('dotenv').config();
+const appId = process.env.APP_ID;
+const appSecret = process.env.APP_SECRET;
 const express = require('express');
 const axios = require('axios');
+const crypto = require('crypto');
+
 const userService = require('../services/usersService');
 const router = express.Router();
 
-const appId = process.env.APP_ID;
-const appSecret = process.env.APP_SECRET;
 
-// 1.处理登录请求，获取openid
-async function handleLogin(req, res) {
+// 处理登录请求
+router.post('/login', async (req, res) => {
     try {
+        // 1.获取code
         const { code } = req.body;
         if (!code) {
-            console.log('请求中缺少code参数');
-            return res.status(400).send('缺少code参数');
+            throw new Error('缺少code参数');
         }
+
+        // 2.使用code获取openid
         const url = `https://api.weixin.qq.com/sns/jscode2session?appid=${appId}&secret=${appSecret}&js_code=${code}&grant_type=authorization_code`;
         const response = await axios.get(url);
-
-        if (response.data && response.data.openid) {
-            console.log('成功获取到openId:', response.data.openid);
-            // 检查用户是否已存在
-            let user = await userService.getUserByOpenId(response.data.openid);
-            if (!user) {
-                // 如果用户不存在，创建新用户
-                user = await userService.createUser({ openid: response.data.openid });
-            }
-            res.send({success: true, user });
-        } else {
-            console.log('微信服务器返回错误:', response.data);
-            res.status(500).send('无法获取openId');
+        if (!response.data || !response.data.openid) {
+            throw new Error('获取openId失败，微信服务器返回错误');
         }
+
+        // 3.创建或获取用户
+        let user = await userService.getUserByOpenId(response.data.openid);
+        if (!user) {
+            user = await userService.createUser({ openid: response.data.openid });
+        }
+        res.send({success: true, user });
     } catch (error) {
-        console.error('处理登录请求时发生错误:', error);
-        res.status(500).send('内部服务器错误');
+        console.error('处理登录请求时发生错误:', error.message);
+        res.status(500).send(error.message);
     }
-}
+});
 
-router.post('/login', handleLogin);
 
-// 2.查找用户信息
+// 查找用户信息
 router.get('/:userId', async (req, res) => {
     try {
         const { userId } = req.params;
@@ -47,11 +46,12 @@ router.get('/:userId', async (req, res) => {
         res.json({ success: true, user });
     } catch (error) {
         console.error('Error getting user:', error);
-        res.status(404).json({ success: false, message: 'User not found', error });
+        res.status(404).json({ success: false, message: error.message });
     }
 });
 
-// 3.删除用户信息
+
+// 删除用户信息
 router.delete('/:userId', async (req, res) => {
     try {
         const { userId } = req.params;
@@ -59,11 +59,12 @@ router.delete('/:userId', async (req, res) => {
         res.json({ success: true, message: 'User deleted successfully' });
     } catch (error) {
         console.error('Error deleting user:', error);
-        res.status(500).json({ success: false, message: 'Error deleting user', error });
+        res.status(500).json({ success: false, message: error.message });
     }
 });
 
-// 4.更新用户信息
+
+// 更新用户信息
 router.put('/:userId', async (req, res) => {
     try {
         const { userId } = req.params;
@@ -87,7 +88,24 @@ router.put('/addPoints/:userId', async (req, res) => {
     }
 });
 
-// 5.获取手机号
+
+// 获取手机号
+function decryptData(encryptedData, iv, sessionKey) {
+    try {
+        const sessionKeyBuffer = Buffer.from(sessionKey, 'base64');
+        const encryptedDataBuffer = Buffer.from(encryptedData, 'base64');
+        const ivBuffer = Buffer.from(iv, 'base64');
+
+        const decipher = crypto.createDecipheriv('aes-128-cbc', sessionKeyBuffer, ivBuffer);
+        decipher.setAutoPadding(true);
+        let decoded = decipher.update(encryptedDataBuffer, 'binary', 'utf8');
+        decoded += decipher.final('utf8');
+
+        return JSON.parse(decoded);
+    } catch (error) {
+        throw new Error('解密失败');
+    }
+}
 router.post('/phone', async (req, res) => {
     const { code, encryptedData, iv } = req.body;
 
@@ -110,29 +128,6 @@ router.post('/phone', async (req, res) => {
     }
 });
 
-// 解密方法实现，需要用到 crypto 模块
-const crypto = require('crypto');
-
-function decryptData(encryptedData, iv, sessionKey) {
-    // base64 decode
-    const sessionKeyBuffer = Buffer.from(sessionKey, 'base64');
-    const encryptedDataBuffer = Buffer.from(encryptedData, 'base64');
-    const ivBuffer = Buffer.from(iv, 'base64');
-
-    try {
-        // 解密
-        const decipher = crypto.createDecipheriv('aes-128-cbc', sessionKeyBuffer, ivBuffer);
-        decipher.setAutoPadding(true);
-        let decoded = decipher.update(encryptedDataBuffer, 'binary', 'utf8');
-        decoded += decipher.final('utf8');
-
-        const decodedData = JSON.parse(decoded);
-
-        return decodedData;
-    } catch (error) {
-        throw new Error('解密失败');
-    }
-}
 
 // 导出路由
 module.exports = router;
