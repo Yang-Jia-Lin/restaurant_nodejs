@@ -33,7 +33,7 @@ router.post('/login', async (req, res) => {
         res.send({success: true, user });
     } catch (error) {
         console.error('处理登录请求时发生错误:', error.message);
-        res.status(500).send(error.message);
+        res.status(500).json({ success: false, message: error.message });
     }
 });
 
