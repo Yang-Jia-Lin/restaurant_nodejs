@@ -31,7 +31,11 @@ router.get('/:storeId', async (req, res) => {
 router.get('/', async (req, res) => {
     try {
         const { latitude, longitude } = req.query;
-
+        // 验证 经纬度是安全的字符串，防止SQL注入
+        if ((latitude && !latitude.match(/^-?\d+\.\d+$/)) ||
+            (longitude && !longitude.match(/^-?\d+\.\d+$/))) {
+            throw new Error('Invalid input for latitude or longitude');
+        }
         let stores;
         if (latitude && longitude) {
             // 如果有经纬度参数，按照距离排序
