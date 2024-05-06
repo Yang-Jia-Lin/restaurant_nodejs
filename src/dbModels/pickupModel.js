@@ -19,7 +19,7 @@ Pickup.init({
     pickup_number: {
         type: DataTypes.INTEGER,
         allowNull: false
-    },
+    },
     pickup_id: {
         type: DataTypes.INTEGER,
         allowNull: false

@@ -52,6 +52,32 @@ router.get('/user/details/:orderId', async (req, res) => {
     }
 });
 
+// 4.用户修改取餐时间
+router.post('/user/changeTime/', async (req, res) => {
+    try {
+        const { orderId, deliverTime } = req.body;
+        const updatedOrder = await OrdersService.changeDeliverTime(orderId, new Date(deliverTime));
+        res.status(200).send({ success: true, message: '送达时间更新成功', order: updatedOrder });
+    } catch (error) {
+        res.status(400).send({ success: false, message: error.message });
+    }
+});
+
+// 5.用户查询订单进度
+router.get('/user/queueNum/:pickup_id', async (req, res) => {
+    try {
+        const pickup_id = parseInt(req.params.pickup_id, 10);  // 从路径参数获取 pickup_id 并转换为整数
+        if (isNaN(pickup_id)) {
+            return res.status(400).send({ success: false, message: '无效的 pickup_id' });
+        }
+        const number = await OrdersService.getQueueNum(pickup_id);
+        res.status(200).send({ success: true, message: '查询成功', number: number });
+    } catch (error) {
+        res.status(400).send({ success: false, message: error.message });
+    }
+});
+
+
 // ===================================门店操作==================================
 // ============================================================================
 

@@ -79,5 +79,25 @@ router.delete('/:storeId', async (req, res) => {
     }
 });
 
+// 6.获取门店时间表
+router.get('/:storeId/timeSlots', async (req, res) => {
+    try {
+        const { storeId } = req.params;
+        const storeWithTimeSlots = await storesService.getStoreWithTimeSlots(storeId);
+        if (!storeWithTimeSlots || !storeWithTimeSlots.timeSlots.length) { // 检查是否真的有时间槽数据返回
+            res.status(404).json({ success: false, message: 'Store with specified time slots not found' });
+        } else {
+            res.json({
+                success: true,
+                lastUpdated: storeWithTimeSlots.lastUpdated, // 传递最后更新时间
+                timeSlots: storeWithTimeSlots.timeSlots // 传递时间槽数组
+            });
+        }
+    } catch (error) {
+        console.error('Error retrieving store with time slots:', error);
+        res.status(500).json({ success: false, message: 'Error retrieving store with time slots', error: error.message });
+    }
+});
+
 // 导出路由
 module.exports = router;

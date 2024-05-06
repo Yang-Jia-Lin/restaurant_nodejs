@@ -4,6 +4,8 @@ const PickupService = require('./pickupService');
 const PrintingService = require('./printingService');
 const {getShouldPrintOrders} = require('../config/configManager');
 
+const {Sequelize} = require("sequelize");
+
 const OrdersService = {
 
     // ===============================订单基础增删改查操作=============================
@@ -171,6 +173,55 @@ const OrdersService = {
             order: [['order_time', 'DESC']],
             limit: 10
         });
+    },
+
+    // 3.修改等待中的订单deliverTime
+    changeDeliverTime: async(orderId, deliverTime) => {
+        if (!(deliverTime instanceof Date)) {
+            throw new Error('deliverTime必须是一个有效的Date对象');
+        }
+
+        try {
+            const order = await Order.findOne({
+                where: { order_id: orderId }
+            });
+
+            if (!order) {
+                throw new Error('未找到指定的订单');
+            }
+
+            if (order.order_status !== '等待中') {
+                throw new Error('订单状态不是等待中，无法修改送达时间');
+            }
+
+            order.delivery_time = deliverTime;
+            await order.save();
+            return order;
+        } catch (error) {
+            console.error('更新送达时间失败:', error);
+            throw error;
+        }
+    },
+
+    // 4.用户查询订单进度
+    getQueueNum: async(pickId) => {
+        try {
+            if (pickId === 0) {
+                const maxPickupId = await Order.max('pickup_id');
+                pickId = maxPickupId || 0;  // 如果没有订单，则默认为 0
+            }
+            return await Order.count({
+                where: {
+                    order_status: '制作中',
+                    pickup_id: {
+                        [Sequelize.Op.lt]: pickId  // 使用 Op.lt 操作符比较
+                    }
+                }
+            }); // 返回计算出的数量
+        } catch (error) {
+            console.error('查询排队订单失败:', error);
+            throw error;
+        }
     },
 
 

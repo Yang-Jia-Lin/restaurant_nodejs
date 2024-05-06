@@ -6,6 +6,7 @@ const Pickup = require('./pickupModel');
 const Admin = require('./adminsModel');
 const Order = require('./ordersModel');
 const OrderDetail = require('./orderDetailsModel');
+const StoreTimeSlot = require('./storeTimeModel');
 
 // 1. Dish与DishCategory之间的关系
 Dish.belongsTo(DishCategory, {
@@ -68,6 +69,18 @@ Store.hasMany(Pickup, {
     as: 'pickup'
 });
 Pickup.belongsTo(Store, {
+    foreignKey: 'store_id',
+    as: 'store'
+});
+
+
+// 7.StoreTime和Store之间的关系
+Store.hasMany(StoreTimeSlot, {
+    foreignKey: 'store_id',
+    as: 'timeSlots'  // 使用 'timeSlots' 来引用关联
+});
+
+StoreTimeSlot.belongsTo(Store, {
     foreignKey: 'store_id',
     as: 'store'
 });

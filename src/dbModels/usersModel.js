@@ -18,7 +18,7 @@ User.init({
     },
     avatar_url: {
         type: DataTypes.STRING(255), // 头像URL，可为空
-        defaultValue: "https://mmbiz.qpic.cn/mmbiz/icTdbqWNOwNRna42FI242Lcia07jQodd2FJGIYQfG0LAJGFxM4FbnQP6yfMxBgJ0F3YRqJCJ1aPAK2dQagdusBZg/0",
+        defaultValue: "https://forestlamb.online/public/restaurant/icon/avatar.png",
     },
     phone_number: {
         type: DataTypes.STRING(20),
