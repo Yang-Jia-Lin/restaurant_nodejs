@@ -50,24 +50,6 @@ const userService = {
             throw error;
         }
     },
-    addUserPoints: async (userId, pointsToAdd) => {
-        try {
-            const user = await User.findByPk(userId);
-            if (!user) {
-                throw new Error('User not found');
-            }
-            const newPoints = (Number(user.points) || 0) + Number(pointsToAdd);
-            const [updated] = await User.update({ points: newPoints }, {
-                where: { user_id: userId }
-            });
-            if (!updated) {
-                throw new Error('Update failed');
-            }
-            return await User.findByPk(userId);
-        } catch (error) {
-            throw error;
-        }
-    },
 
 
     // 4.删除用户

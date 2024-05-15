@@ -13,6 +13,7 @@ app.use(limiter);
 
 // 加载：应用的路由模块
 const sequelize = require('./config/dbConfig');
+const wechatToken = require('./controllers/wechatToken');
 const usersController = require('./controllers/usersController');
 const storesController = require('./controllers/storesController');
 const dishesController = require('./controllers/dishesController');
@@ -23,7 +24,9 @@ const payController = require('./controllers/payController');
 const addressController = require('./controllers/addressController');
 const printerController = require('./controllers/printerController');
 const setPrinter = require('./controllers/setPrint');
-const OrdersService = require('./services/ordersService');
+const pointsController = require('./controllers/pointDetailsController');
+const invitationController = require('./controllers/invitationController');
+const ordersService = require('./services/ordersService');
 
 // 加载：应用的跨域模块
 const cors = require('cors');
@@ -51,6 +54,9 @@ app.use('/restaurant/pay', payController);
 app.use('/restaurant/address', addressController);
 app.use('/restaurant/printer', printerController);
 app.use('/restaurant/setPrinter', setPrinter);
+app.use('/restaurant/points', pointsController);
+app.use('/restaurant/token', wechatToken);
+app.use('/restaurant/invite', invitationController);
 
 
 // 路由模块加载完成后，启动Express服务器，监听端口3000，并连接数据库
@@ -59,7 +65,7 @@ sequelize.sync().then(() => {
         // 启动定时任务
         setInterval(async () => {
             try {
-                await OrdersService.scanAndProcessOrders();
+                await ordersService.scanAndProcessOrders();
             } catch (error) {
                 console.error('Error processing orders:', error);
             }

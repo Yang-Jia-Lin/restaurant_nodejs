@@ -4,6 +4,7 @@ const { updateOrderQueue } = require('./queueHandlers'); // 队列处理器
 const OrdersService = require('../services/ordersService');
 const userService = require("../services/usersService");
 const emailAlertService = require('../config/emailAlertService');
+const pointDetailsService = require("../services/pointDetailsService");
 const router = express.Router();
 
 // 创建PayService实例
@@ -79,19 +80,20 @@ router.post('/create_and_pay_points', async (req, res) => {
         const order = await OrdersService.createOrder(orderData, orderDetails);
 
         // 2.消费积点
-        const pointsToDeduct = req.body.pointsToDeduct;
+        const pointsToDeduct = parseFloat(req.body.pointsToDeduct);
         const userId = orderData.user_id;
         const user = await userService.getUserById(userId);
-        if (user.points < pointsToDeduct) {
+        if (user.points < pointsToDeduct || isNaN(pointsToDeduct)) {
             throw new Error('积点不足');
         }
-        const updatedUser = await userService.updateUser(userId, { points: user.points - pointsToDeduct });
+        //const updatedUser = await userService.updateUser(userId, { points: user.points - pointsToDeduct });
+        const { updatedUser, pointDetail } = await pointDetailsService.addUserPoints(userId, - pointsToDeduct, '消费免单');
 
         // 3.订单更新任务添加到队列
         await addOrderToUpdateQueue(order.order_id);
 
         // 4.返回结果
-        res.status(201).json({success: true, order: order, user: updatedUser});
+        res.status(201).json({success: true, order: order, user: updatedUser, points:pointDetail});
 
     } catch (error) {
         console.error('积点支付失败', error);
