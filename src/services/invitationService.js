@@ -48,17 +48,21 @@ const InvitationService = {
     completeInvitation: async (inviteeId) => {
         const invitation = await Invitation.findOne({ where: { invitee: inviteeId } });
         const inviter = await User.findOne({ where: { user_id: invitation.inviter } });
+        const invitee = await User.findOne({ where: { user_id: invitation.invitee } });
         try {
             // 1.赠送积点
             await pointDetailsService.addUserPoints(invitation.inviter, 2, '邀请赠送');
 
             // 2.发送通知
-            const templateId = 'shRFentLzPN-2o1F3Om1mkYJkbCZXCQUSiZyrf0isns'; // 订阅消息模板ID
+            const templateId = 'oSA8CXtPkmkXZ0kz_cbkPBlBHiAYMaTFTACyddPvM0I'; // 订阅消息模板ID
+            const now = new Date();
+            const formattedDate = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
             const page = 'pages/My/points/points'; // 用户点击消息后跳转的小程序页面
             const data = {
-                number2: { value: 2 },
-                thing5: { value: '唐合丰拌面馆-启辰餐厅1层33号窗口' },
-                thing6: { value: '您邀请的朋友已成功加入，积点已到账！'}
+                thing1:{ value: invitee.nickname},
+                thing3:{ value: '积点 2个'},
+                date2:{ value: formattedDate },
+                thing4: { value: '感谢您对本店的支持！欢迎继续分享~'}
             };
             await sendSubscribeMessage(inviter.openid, templateId, page, data);
 
