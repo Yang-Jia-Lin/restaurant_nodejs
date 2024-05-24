@@ -66,13 +66,17 @@ Order.init({
         allowNull: false
     },
     description: {
-    	   type: DataTypes.STRING(255),
-	   defaultValue: '唐合丰面馆订单'
+        type: DataTypes.STRING(255),
+	    defaultValue: '唐合丰面馆订单'
     },
     pickup_id: {
         type: DataTypes.INTEGER,
         defaultValue: 0,
         allowNull: false
+    },
+    points: {
+        type: DataTypes.DECIMAL(4, 2),
+        defaultValue: 0.0
     },
     note: DataTypes.TEXT,
     address: DataTypes.TEXT,
